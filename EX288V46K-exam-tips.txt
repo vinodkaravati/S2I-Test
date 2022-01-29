@@ -1,0 +1,26 @@
+1. Deploying Application - Git URL given, clone the repo, NodeJS application, fix package.json syntax error (missing comma) for successful build, access the URL of the application, paste & save the given text.
+
+2. Optimize Container File - Git URL given, clone the repo, optimize the Containerfile - merge the RUN commands, Add the ONBUILD COPY command to allow child images to inject their own content, add user instruction for fixed user given, expose 8080 port(instead of 80), update LABEL and add 'sed' commands, fix permission issue by adding 'chgrp' and 'chmod', build image (specify '--format docker' to support ONBUILD), tag image and push to private registry, create secret to pull the image, create new app from the docker image.
+
+3. Customizing S2I Builds - Image name would be mentioned which is located in private registry, create secret, create image stream, from the Git URL given, clone the repo to get the S2I scripts, .s2i/bin/assemble would be hidden, add the required customization (add copy command, format date [YYYY-mm-dd], echo date, echo given text) in assemble. create new app from created image stream and customized s2i script.
+
+4. Injecting Configuration Data into an Application - Image name would be mentioned which is located in private registry, create secret to pull the image and link the secret, create config map, inject data using CM. specify --as-deployment-config while creating new-app
+
+5. Allowing Access to the OpenShift Registry - oc patch to set default Route to true for internal registry, get route of internal registry, podman login with user and token (oc whoami -t), podman pull to get the image from internal registry (namespace and image name would be given).
+
+6. Implementing Post-Commit Build Hooks - application would already exist, need to expose the service, set "python3 mailer.py" as the Post-Commit Build Hook command in build config, start new build. Validation steps: describe bc & grep for post-commit, check the bc log.
+7. Activating Probe : set liveness probe. Parameters - tcp port, initial delay and timeout. Validation steps describe dc & grep for liveness.
+
+8. Helm: Expected directory of the chart would be given which would be name of the chart. helm create <name of the chart>. In Chart.yaml update the chart version, in values.yaml update the image repo, tag and replica count. In templates/deployment.yaml update the container port, liveness and readiness url, then run 'helm install' by the given application name.
+
+9. Working with templates:
+Template URL would be given for both json and yaml format.
+Access the yml url of the template in browser, copy the content and paste into a file called template.yml.
+Create a template of given name in the specified project or namespace - need to update the template name and namespace in template.yml, oc create -f template.yml
+Update GIT url for PHP application {You should able to identify this under build-config, url will be given in question}
+Update the PHP and MySql image version {Check which version is available in openshift namespace - oc get istag -n openshift | grep 'php', oc get istag -n openshift | grep 'mysql' --> to get the available versions and update the Build-Config of PHP and Deployment-Config of mysql}
+oc delete all -l template=php-app - should delete all the resources created by the template. - need to set fixed value for the selector label.
+Add a parameter HELLO_AUDIENCE, set a default value "Engineer", Set as required=false (as it is not mandatory) {Go at the end of the template and add the same, pass this parameter in PHP deployment-config; follow the existing one}
+oc new-app <template-name> this should fail {solution - Goto the parameters section and make APP_HOST as required=true}
+oc new-app <template-name> -p APP_HOST=<qualified host name as mentioned in question> {This entire command will provided, just test it, response should be Bonjour Engineers!}
+oc new-app <template-name> -p APP_HOST=<qualified host name> -p HELLO_MESSAGE="Namaste" -p HELLO_AUDIENCE="Architects"  {This entire command will provided just test it, response should be Namaste Architects!} -> oc delete all -l template=php-app should be executed before.
